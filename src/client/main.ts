@@ -1,6 +1,7 @@
 import './style.css'
 
 import type { Article, ArticleFacets, ArticleIndex, SearchQuery, SortOrder } from '../shared/article'
+import { siteConfig } from '../site-config'
 import { filterArticles } from './filter'
 import { createArticleCard, renderDialog } from './render'
 
@@ -16,6 +17,11 @@ const dialog = required<HTMLDialogElement>('#article-dialog')
 const notice = required<HTMLElement>('[data-notice]')
 const sort = required<HTMLSelectElement>('#sort')
 let allArticles: Article[] = []
+
+document.title = siteConfig.title
+required<HTMLElement>('[data-site-name]').textContent = siteConfig.headerTitle
+required<HTMLElement>('[data-site-title]').textContent = siteConfig.title
+required<HTMLAnchorElement>('[data-repository-link]').href = siteConfig.repositoryUrl
 
 const control = <T extends HTMLInputElement | HTMLSelectElement>(id: string): T => required<T>(id)
 

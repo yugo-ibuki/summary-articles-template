@@ -10,6 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
+    "types": "wrangler types --include-runtime false",
+    "types:check": "wrangler types --include-runtime false --check",
     "generate:data": "cargo run --quiet --manifest-path cli/Cargo.toml -- build --content-dir content/articles --output public/data/articles.json",
     "validate:data": "cargo run --quiet --manifest-path cli/Cargo.toml -- validate --content-dir content/articles",
     "deploy": "npm run build && wrangler deploy",
@@ -20,7 +22,6 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.52.1",
-    "@cloudflare/workers-types": "5.20260815.1",
     "@types/node": "24.10.1",
     "happy-dom": "20.11.2",
     "typescript": "6.0.3",
