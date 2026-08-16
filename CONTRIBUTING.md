@@ -5,16 +5,18 @@ IssueやPull Requestを歓迎します。個人用の記事データや秘密情
 ## 開発手順
 
 ```bash
+rustup target add wasm32-unknown-unknown
+cargo install worker-build --version 0.8.5 --locked
 npm install
+cargo fmt --all --check
+cargo test --workspace
+cargo clippy --workspace --all-targets -- -D warnings
 npm test
-npm run typecheck
-cargo test --manifest-path cli/Cargo.toml
-cargo fmt --manifest-path cli/Cargo.toml --check
-cargo clippy --manifest-path cli/Cargo.toml --all-targets -- -D warnings
 npm run build
+npm run deploy:dry-run
 ```
 
-記事データの仕様を変更する場合は、Rustのモデル、`article.schema.json`、TypeScriptの型、README、サンプル記事を同じPull Requestで更新してください。
+記事データの仕様を変更する場合は、Rustのモデル、`article.schema.json`、README、記事保存スキルを同じPull Requestで更新してください。Cloudflare以外でも使えるアプリ境界を保ち、プラットフォーム固有コードは専用アダプターへ置いてください。
 
 ## サンプルデータ
 
