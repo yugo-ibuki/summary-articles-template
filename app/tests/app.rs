@@ -119,8 +119,9 @@ async fn serves_health_and_article_json() {
 #[tokio::test]
 async fn serves_browser_assets_with_explicit_content_types() {
     let (css_status, css_headers, css_body) = get("/assets/style.css").await;
-    let (js_status, js_headers, js_body) = get("/assets/main.js").await;
-    let (filter_status, filter_headers, filter_body) = get("/assets/filter.js").await;
+    let (runtime_status, runtime_headers, runtime_body) = get("/assets/topcoat-runtime.js").await;
+    let (main_status, _, _) = get("/assets/main.js").await;
+    let (filter_status, _, _) = get("/assets/filter.js").await;
 
     assert_eq!(css_status, 200);
     assert_eq!(
@@ -128,18 +129,14 @@ async fn serves_browser_assets_with_explicit_content_types() {
         "text/css; charset=utf-8"
     );
     assert!(css_body.contains(".article-grid"), "{css_body}");
-    assert_eq!(js_status, 200);
+    assert_eq!(runtime_status, 200);
     assert_eq!(
-        js_headers.get("content-type").unwrap(),
+        runtime_headers.get("content-type").unwrap(),
         "text/javascript; charset=utf-8"
     );
-    assert!(js_body.contains("article-dialog"), "{js_body}");
-    assert_eq!(filter_status, 200);
-    assert_eq!(
-        filter_headers.get("content-type").unwrap(),
-        "text/javascript; charset=utf-8"
-    );
-    assert!(filter_body.contains("matchesArticle"), "{filter_body}");
+    assert!(runtime_body.contains("data-topcoat-bind"), "{runtime_body}");
+    assert_eq!(main_status, 404);
+    assert_eq!(filter_status, 404);
 }
 
 #[tokio::test]

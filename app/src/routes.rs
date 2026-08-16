@@ -6,8 +6,6 @@ use topcoat::{
 use yoyaku::ArticleIndex;
 
 const CSS: &str = include_str!("../web/style.css");
-const FILTER_JS: &str = include_str!("../web/filter.js");
-const MAIN_JS: &str = include_str!("../web/main.js");
 
 fn response(
     content_type: &'static str,
@@ -47,21 +45,12 @@ async fn style() -> Result<Response> {
     )
 }
 
-#[route(GET "/assets/filter.js")]
-async fn filter_js() -> Result<Response> {
+#[route(GET "/assets/topcoat-runtime.js")]
+async fn topcoat_runtime() -> Result<Response> {
     response(
         "text/javascript; charset=utf-8",
         "public, max-age=3600",
-        FILTER_JS.to_owned(),
-    )
-}
-
-#[route(GET "/assets/main.js")]
-async fn main_js() -> Result<Response> {
-    response(
-        "text/javascript; charset=utf-8",
-        "public, max-age=3600",
-        MAIN_JS.to_owned(),
+        crate::runtime_asset::script().to_owned(),
     )
 }
 
@@ -70,6 +59,5 @@ pub(crate) fn register(builder: RouterBuilder) -> RouterBuilder {
         .route(health)
         .route(articles)
         .route(style)
-        .route(filter_js)
-        .route(main_js)
+        .route(topcoat_runtime)
 }

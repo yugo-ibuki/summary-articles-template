@@ -11,7 +11,7 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 http = "1.5.0"
 serde_json = "1.0.151"
-topcoat = { version = "0.5.0", default-features = false, features = ["router", "view"] }
+topcoat = { version = "0.5.0", default-features = false, features = ["asset", "router", "runtime", "view"] }
 unicode-normalization = "0.1.25"
 yoyaku = { path = "../cli", default-features = false }
 

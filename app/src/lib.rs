@@ -3,9 +3,10 @@ mod cloudflare;
 mod config;
 mod page;
 mod routes;
+mod runtime_asset;
 mod search;
 
-use topcoat::router::Router;
+use topcoat::{asset::RouterBuilderAssetExt, router::Router};
 use yoyaku::ArticleIndex;
 
 pub use config::{REPOSITORY_URL_ENV, SiteConfig};
@@ -23,6 +24,7 @@ pub fn router_with_index(index: ArticleIndex) -> Router {
 
 pub fn router_with_config(index: ArticleIndex, config: SiteConfig) -> Router {
     routes::register(Router::builder().page(page::home))
+        .assets(runtime_asset::config())
         .app_context(index)
         .app_context(config)
         .build()
