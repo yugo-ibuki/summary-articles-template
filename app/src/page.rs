@@ -36,7 +36,7 @@ async fn render_home(cx: &Cx, index: &ArticleIndex, config: &SiteConfig) -> Resu
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <meta name="description" content="Gitで管理する記事要約アーカイブ">
                 <title>(TITLE)</title>
-                <link rel="stylesheet" href="/assets/style.css">
+                <link rel="stylesheet" href="/assets/style.css?v=2">
                 topcoat::runtime::script()
             </head>
             <body>

@@ -44,6 +44,7 @@ async fn renders_the_article_archive_with_topcoat_runtime() {
     assert!(html.contains("詳しい説明です。"), "{html}");
     assert!(html.contains("id=\"search-form\""), "{html}");
     assert!(html.contains("/assets/topcoat-runtime.js"), "{html}");
+    assert!(html.contains("/assets/style.css?v=2"), "{html}");
     assert!(html.contains("::topcoat::scope::start"), "{html}");
     assert!(html.contains("href=\"#article-rust-workers\""), "{html}");
     assert!(html.contains("role=\"dialog\""), "{html}");
@@ -128,6 +129,7 @@ async fn serves_browser_assets_with_explicit_content_types() {
         css_headers.get("content-type").unwrap(),
         "text/css; charset=utf-8"
     );
+    assert_eq!(css_headers.get("cache-control").unwrap(), "no-cache");
     assert!(css_body.contains(".article-grid"), "{css_body}");
     assert_eq!(runtime_status, 200);
     assert_eq!(

@@ -38,11 +38,7 @@ async fn articles(cx: &Cx) -> Result<Response> {
 
 #[route(GET "/assets/style.css")]
 async fn style() -> Result<Response> {
-    response(
-        "text/css; charset=utf-8",
-        "public, max-age=3600",
-        CSS.to_owned(),
-    )
+    response("text/css; charset=utf-8", "no-cache", CSS.to_owned())
 }
 
 #[route(GET "/assets/topcoat-runtime.js")]
