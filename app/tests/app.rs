@@ -3,7 +3,7 @@ use topcoat::{
     router::{Body, Request, to_bytes},
 };
 use yoyaku::{Article, ArticleFacets, ArticleIndex, Ogp};
-use yoyaku_app::{render_home, router, router_with_index};
+use yoyaku_app::{SiteConfig, render_home, router, router_with_config, router_with_index};
 
 fn fixture_index() -> ArticleIndex {
     ArticleIndex {
@@ -63,6 +63,28 @@ async fn topcoat_router_serves_the_home_page() {
 
     assert_eq!(status, 200);
     assert!(html.contains("Yoyaku"), "{html}");
+}
+
+#[tokio::test]
+async fn repository_link_comes_from_site_config() {
+    let response = router_with_config(
+        fixture_index(),
+        SiteConfig::new(Some("https://github.com/example/yoyaku".to_owned())),
+    )
+    .handle(Request::builder().uri("/").body(Body::empty()).unwrap())
+    .await;
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let html = String::from_utf8(body.to_vec()).unwrap();
+
+    assert!(html.contains("https://github.com/example/yoyaku"), "{html}");
+
+    let response = router_with_index(fixture_index())
+        .handle(Request::builder().uri("/").body(Body::empty()).unwrap())
+        .await;
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let html = String::from_utf8(body.to_vec()).unwrap();
+
+    assert!(!html.contains("GitHub リポジトリ"), "{html}");
 }
 
 async fn get(path: &str) -> (http::StatusCode, http::HeaderMap, String) {

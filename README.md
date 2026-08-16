@@ -28,7 +28,10 @@ Hono、Vite、TypeScriptは使用しません。WorkerはRustからWebAssembly�
 rustup target add wasm32-unknown-unknown
 cargo install worker-build --version 0.8.5 --locked
 npm install
+cp .dev.vars.example .dev.vars
 ```
+
+`.dev.vars`の`YOYAKU_REPOSITORY_URL`をフォーク先のURLへ変更します。未設定なら画面のGitHubリンクは表示されません。
 
 ## ローカルで起動
 
@@ -70,7 +73,12 @@ npm run generate:data
 
 カード全体でモーダルを開きます。元記事へ移動するのはモーダル内の「元記事を開く」リンクだけです。
 
-サイト名とリンクは[app/src/config.rs](./app/src/config.rs)で変更します。
+サイト名は[app/src/config.rs](./app/src/config.rs)で変更します。GitHubリンクは環境変数`YOYAKU_REPOSITORY_URL`から読み込みます。Rust CLIでOGPを取得するときも、同じ環境変数がUser-Agentへ使われます。
+
+```bash
+export YOYAKU_REPOSITORY_URL=https://github.com/your-name/your-repository
+cargo run -p yoyaku -- enrich content/articles/my-article.json
+```
 
 ## テストとビルド
 
@@ -99,6 +107,8 @@ GitHub Actionsから自動デプロイする場合は、フォーク先のSettin
 - Actions secret `CLOUDFLARE_API_TOKEN`
 - Actions secret `CLOUDFLARE_ACCOUNT_ID`
 
+Cloudflare DashboardのWorker設定には、非機密の環境変数`YOYAKU_REPOSITORY_URL`としてフォーク先のURLを設定します。`wrangler.jsonc`は`keep_vars: true`なので、Dashboardの値は次回デプロイでも保持されます。
+
 `release`ブランチへpushするとCIが実行され、成功した同じコミットだけがCloudflare Workersへデプロイされます。Secretsを設定していないフォークでは`release`ブランチを使わず、CI対象のpull requestまたは`main`ブランチだけを利用してください。トークン、アカウントID、カスタムドメイン、非公開記事をリポジトリへコミットしないでください。
 
 ## Commonと個人フォークの境界
@@ -112,7 +122,7 @@ GitHub Actionsから自動デプロイする場合は、フォーク先のSettin
 個人用フォークだけへ置くもの:
 
 - 自分の記事JSON
-- 自分のサイト名とリポジトリURL
+- 自分のサイト名と環境変数`YOYAKU_REPOSITORY_URL`
 - Cloudflare Secretsとドメイン設定
 - D1、管理画面、LLM分析など個人運用向け機能
 

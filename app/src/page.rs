@@ -6,11 +6,16 @@ use topcoat::{
 };
 use yoyaku::{Article, ArticleIndex};
 
-use crate::config::{HEADER_TITLE, REPOSITORY_URL, TITLE};
+use crate::config::{HEADER_TITLE, SiteConfig, TITLE};
 
 #[page("/")]
 pub async fn home(cx: &Cx) -> Result {
-    render_home(cx, app_context::<ArticleIndex>(cx)).await
+    render_home_with_config(
+        cx,
+        app_context::<ArticleIndex>(cx),
+        app_context::<SiteConfig>(cx),
+    )
+    .await
 }
 
 fn format_date(date: &str) -> String {
@@ -29,6 +34,10 @@ fn searchable_text(article: &Article) -> String {
 }
 
 pub async fn render_home(cx: &Cx, index: &ArticleIndex) -> Result {
+    render_home_with_config(cx, index, &SiteConfig::default()).await
+}
+
+async fn render_home_with_config(cx: &Cx, index: &ArticleIndex, config: &SiteConfig) -> Result {
     let total = index.articles.len();
     view! {
         cx =>
@@ -47,9 +56,11 @@ pub async fn render_home(cx: &Cx, index: &ArticleIndex) -> Result {
                         <div class="site-name">(HEADER_TITLE)</div>
                         <div class="header-meta">
                             <span data-total-count="">(format!("収録 {total}件"))</span>
-                            <a href=(REPOSITORY_URL) target="_blank" rel="noopener noreferrer">
-                                "GitHub リポジトリ ↗"
-                            </a>
+                            if let Some(repository_url) = config.repository_url() {
+                                <a href=(repository_url) target="_blank" rel="noopener noreferrer">
+                                    "GitHub リポジトリ ↗"
+                                </a>
+                            }
                         </div>
                     </header>
 

@@ -8,6 +8,7 @@ use url::Url;
 use crate::Ogp;
 
 const MAX_HTML_BYTES: u64 = 2_000_000;
+const REPOSITORY_URL_ENV: &str = "YOYAKU_REPOSITORY_URL";
 
 pub fn parse_ogp(html: &str, base_url: &Url) -> Result<Ogp> {
     let document = Html::parse_document(html);
@@ -67,10 +68,11 @@ pub fn parse_ogp(html: &str, base_url: &Url) -> Result<Ogp> {
 }
 
 pub fn fetch_ogp(url: &Url) -> Result<Ogp> {
+    let repository_url = std::env::var(REPOSITORY_URL_ENV).ok();
     let client = Client::builder()
         .timeout(Duration::from_secs(10))
         .redirect(Policy::limited(5))
-        .user_agent("yoyaku/0.1 (+https://github.com/yugo-ibuki/summary-articles)")
+        .user_agent(user_agent_for_repository(repository_url.as_deref()))
         .build()?;
     let response = client.get(url.clone()).send()?.error_for_status()?;
     if let Some(content_type) = response
@@ -91,4 +93,28 @@ pub fn fetch_ogp(url: &Url) -> Result<Ogp> {
         bail!("HTMLが上限の{MAX_HTML_BYTES}バイトを超えています");
     }
     parse_ogp(&body, url)
+}
+
+fn user_agent_for_repository(repository_url: Option<&str>) -> String {
+    repository_url
+        .map(str::trim)
+        .filter(|value| value.starts_with("https://") || value.starts_with("http://"))
+        .map_or_else(
+            || "yoyaku/0.1".to_owned(),
+            |value| format!("yoyaku/0.1 (+{value})"),
+        )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::user_agent_for_repository;
+
+    #[test]
+    fn user_agent_uses_the_repository_url_only_when_configured() {
+        assert_eq!(user_agent_for_repository(None), "yoyaku/0.1");
+        assert_eq!(
+            user_agent_for_repository(Some("https://github.com/example/yoyaku")),
+            "yoyaku/0.1 (+https://github.com/example/yoyaku)"
+        );
+    }
 }
