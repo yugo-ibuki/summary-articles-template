@@ -3,6 +3,7 @@ mod cloudflare;
 mod config;
 mod page;
 mod routes;
+mod search;
 
 use topcoat::router::Router;
 use yoyaku::ArticleIndex;
