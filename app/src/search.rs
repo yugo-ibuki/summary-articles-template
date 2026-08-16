@@ -155,6 +155,7 @@ mod tests {
 
     use super::{SearchQuery, search_articles};
 
+    #[allow(clippy::too_many_arguments)]
     fn article(
         id: &str,
         title: &str,

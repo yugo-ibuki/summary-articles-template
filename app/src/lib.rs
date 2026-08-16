@@ -6,12 +6,10 @@ mod routes;
 mod runtime_asset;
 mod search;
 
-use topcoat::{asset::RouterBuilderAssetExt, router::Router};
+use topcoat::{asset::RouterBuilderAssetExt, router::Router, runtime::RouterBuilderShardExt};
 use yoyaku::ArticleIndex;
 
 pub use config::{REPOSITORY_URL_ENV, SiteConfig};
-pub use page::render_home;
-
 const ARTICLE_INDEX: &str = include_str!("../../public/data/articles.json");
 
 pub fn router() -> Result<Router, serde_json::Error> {
@@ -23,9 +21,13 @@ pub fn router_with_index(index: ArticleIndex) -> Router {
 }
 
 pub fn router_with_config(index: ArticleIndex, config: SiteConfig) -> Router {
-    routes::register(Router::builder().page(page::home))
-        .assets(runtime_asset::config())
-        .app_context(index)
-        .app_context(config)
-        .build()
+    routes::register(
+        Router::builder()
+            .page(page::home)
+            .shard(page::article_results),
+    )
+    .assets(runtime_asset::config())
+    .app_context(index)
+    .app_context(config)
+    .build()
 }

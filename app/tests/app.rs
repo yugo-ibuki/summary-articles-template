@@ -1,9 +1,6 @@
-use topcoat::{
-    context::Cx,
-    router::{Body, Request, to_bytes},
-};
+use topcoat::router::{Body, Request, to_bytes};
 use yoyaku::{Article, ArticleFacets, ArticleIndex, Ogp};
-use yoyaku_app::{SiteConfig, render_home, router, router_with_config, router_with_index};
+use yoyaku_app::{SiteConfig, router, router_with_config, router_with_index};
 
 fn fixture_index() -> ArticleIndex {
     ArticleIndex {
@@ -33,23 +30,26 @@ fn fixture_index() -> ArticleIndex {
 }
 
 #[tokio::test]
-async fn renders_the_article_archive_with_summary_templates() {
-    let cx = Cx::default();
-    let html = render_home(&cx, &fixture_index())
-        .await
-        .unwrap()
-        .render(&cx);
+async fn renders_the_article_archive_with_topcoat_runtime() {
+    let response = router_with_index(fixture_index())
+        .handle(Request::builder().uri("/").body(Body::empty()).unwrap())
+        .await;
+    let body = to_bytes(response.into_body(), usize::MAX).await.unwrap();
+    let html = String::from_utf8(body.to_vec()).unwrap();
 
     assert!(html.starts_with("<!DOCTYPE html>"), "{html}");
     assert!(html.contains("Yoyaku"), "{html}");
     assert!(html.contains("article-grid"), "{html}");
     assert!(html.contains("Cloudflare WorkersでRustを動かす"), "{html}");
-    assert!(html.contains("<template"), "{html}");
     assert!(html.contains("詳しい説明です。"), "{html}");
-    assert!(html.contains("data-search="), "{html}");
     assert!(html.contains("id=\"search-form\""), "{html}");
-    assert_eq!(html.matches("id=\"article-dialog\"").count(), 1, "{html}");
-    assert!(html.contains("data-dialog-summary"), "{html}");
+    assert!(html.contains("/assets/topcoat-runtime.js"), "{html}");
+    assert!(html.contains("::topcoat::scope::start"), "{html}");
+    assert!(html.contains("href=\"#article-rust-workers\""), "{html}");
+    assert!(html.contains("role=\"dialog\""), "{html}");
+    assert!(!html.contains("/assets/main.js"), "{html}");
+    assert!(!html.contains("data-search="), "{html}");
+    assert!(!html.contains("<template"), "{html}");
 }
 
 #[tokio::test]
