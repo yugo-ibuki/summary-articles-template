@@ -51,6 +51,8 @@ button, select { color: inherit; }
 .sort-field select { height: 28px; margin: 0; font-size: 11px; }
 .notice { padding: 24px 0; color: var(--sub); font-size: 13px; }
 .article-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 48px 35px; align-items: stretch; }
+.article-item { min-width: 0; height: 100%; }
+.article-item[hidden] { display: none; }
 .article-card { appearance: none; display: flex; flex-direction: column; align-items: stretch; width: 100%; min-width: 0; height: 100%; padding: 0 0 13px; border: 0; border-bottom: 1px solid #bfc5bf; background: transparent; color: inherit; cursor: pointer; text-align: left; }
 .article-card:hover .title { text-decoration: underline; text-underline-offset: 4px; }
 .article-card:focus { outline: 0; }

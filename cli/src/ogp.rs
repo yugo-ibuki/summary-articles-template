@@ -77,10 +77,10 @@ pub fn fetch_ogp(url: &Url) -> Result<Ogp> {
         .headers()
         .get(CONTENT_TYPE)
         .and_then(|value| value.to_str().ok())
+        && !content_type.contains("text/html")
+        && !content_type.contains("application/xhtml+xml")
     {
-        if !content_type.contains("text/html") && !content_type.contains("application/xhtml+xml") {
-            bail!("HTMLではない応答です: {content_type}");
-        }
+        bail!("HTMLではない応答です: {content_type}");
     }
 
     let mut body = String::new();

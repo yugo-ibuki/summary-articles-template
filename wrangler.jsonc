@@ -1,12 +1,10 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "summary-articles",
-  "main": "./worker/index.ts",
-  "compatibility_date": "2026-08-15",
-  "compatibility_flags": ["nodejs_compat"],
-  "assets": {
-    "not_found_handling": "single-page-application",
-    "run_worker_first": ["/api/*"]
+  "main": "./app/build/worker/shim.mjs",
+  "compatibility_date": "2026-08-16",
+  "build": {
+    "command": "worker-build --release --no-panic-recovery app"
   },
   "observability": {
     "enabled": true,

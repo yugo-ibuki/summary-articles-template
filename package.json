@@ -4,29 +4,15 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "npm run generate:data && vite dev",
-    "build": "npm run generate:data && vite build",
-    "preview": "vite preview",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
-    "types": "wrangler types --include-runtime false",
-    "types:check": "wrangler types --include-runtime false --check",
-    "generate:data": "cargo run --quiet --manifest-path cli/Cargo.toml -- build --content-dir content/articles --output public/data/articles.json",
-    "validate:data": "cargo run --quiet --manifest-path cli/Cargo.toml -- validate --content-dir content/articles",
-    "deploy": "npm run build && wrangler deploy",
-    "deploy:dry-run": "npm run build && wrangler deploy --dry-run"
-  },
-  "dependencies": {
-    "hono": "4.13.2"
+    "dev": "npm run generate:data && wrangler dev",
+    "build": "npm run generate:data && worker-build --release --no-panic-recovery app",
+    "test": "node --test app/web/*.test.js",
+    "generate:data": "cargo run --quiet -p yoyaku -- build --content-dir content/articles --output public/data/articles.json",
+    "validate:data": "cargo run --quiet -p yoyaku -- validate --content-dir content/articles",
+    "deploy": "npm run generate:data && wrangler deploy",
+    "deploy:dry-run": "npm run generate:data && wrangler deploy --dry-run"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "1.52.1",
-    "@types/node": "24.10.1",
-    "happy-dom": "20.11.2",
-    "typescript": "6.0.3",
-    "vite": "8.2.1",
-    "vitest": "4.1.10",
     "wrangler": "4.123.0"
   }
 }
