@@ -10,17 +10,20 @@ URL、要約、ジャンル、技術、日付、読了時間をGitで管理し�
 
 - Topcoat/Rust: HTML、3列カード、固定サイドバー、APIを提供
 - `workers-rs`: Cloudflare FetchイベントをTopcoat Routerへ接続
-- 依存のないJavaScript/CSS: 複合検索、並び替え、要約モーダル
+- Topcoat Runtime: signalとShardによる複合検索、並び替え
+- CSS: URLフラグメントによる要約モーダル
 - Rust CLI: 記事JSONの検証、OGP取得、配信用索引の生成
 - GitHub Actions: pull requestと主要ブランチのCI、`release`ブランチからのCloudflareデプロイ
 
-Hono、Vite、TypeScriptは使用しません。WorkerはRustからWebAssemblyへコンパイルし、Cloudflare公式の[`workers-rs`](https://developers.cloudflare.com/workers/languages/rust/)で実行します。TopcoatのHTTPアプリとCloudflareアダプターを分離しているため、別のRustホストへ移す場合は`app/src/cloudflare.rs`だけを置き換えられます。
+Hono、Vite、TypeScript、手書きのブラウザJavaScriptは使用しません。WorkerはRustからWebAssemblyへコンパイルし、Cloudflare公式の[`workers-rs`](https://developers.cloudflare.com/workers/languages/rust/)で実行します。TopcoatのHTTPアプリとCloudflareアダプターを分離しているため、別のRustホストへ移す場合は`app/src/cloudflare.rs`だけを置き換えられます。
+
+Topcoat Runtime 0.5は実験的な機能です。検索条件はブラウザのsignalへ保持し、変更時にRustのShardが結果領域だけをサーバーレンダリングします。ブラウザへ配信するJavaScriptはCargo.lockで固定したTopcoat Runtime本体だけです。
 
 ## 必要な環境
 
 - Rust 1.95.0（`rust-toolchain.toml`で固定）
 - `wasm32-unknown-unknown`ターゲット
-- Node.js 22.12以降（CIは24）
+- Node.js 22.12以降（Wrangler用、CIは24）
 - npm
 - `worker-build` 0.8.5
 
@@ -69,9 +72,9 @@ npm run generate:data
 
 ## 検索と表示
 
-キーワード、ジャンル、使用技術、掲載元、作成日の範囲、読了時間をANDで組み合わせます。キーワードはタイトル、全要約、掲載元、ジャンル、技術を対象にし、更新日、作成日、タイトルで並び替えられます。
+キーワード、ジャンル、使用技術、掲載元、作成日の範囲、読了時間をANDで組み合わせます。キーワードはタイトル、全要約、掲載元、ジャンル、技術を対象にし、更新日、作成日、タイトルで並び替えられます。条件変更のたびにTopcoat RuntimeがShardへ問い合わせ、Rust側の同じ検索実装で一覧を差し替えます。
 
-カード全体でモーダルを開きます。元記事へ移動するのはモーダル内の「元記事を開く」リンクだけです。
+カード全体でURLフラグメントのモーダルを開きます。ページ遷移や追加のJavaScriptはなく、元記事へ移動するのはモーダル内の「元記事を開く」リンクだけです。
 
 サイト名は[app/src/config.rs](./app/src/config.rs)で変更します。GitHubリンクは環境変数`YOYAKU_REPOSITORY_URL`から読み込みます。Rust CLIでOGPを取得するときも、同じ環境変数がUser-Agentへ使われます。
 
